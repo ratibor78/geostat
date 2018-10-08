@@ -23,12 +23,12 @@ def logparse(LOGPATH, INFLUXHOST, INFLUXPORT, INFLUXDBDB, INFLUXUSER, INFLUXUSER
     IPS = {}
     GEOHASH = {}
     COUNT = {}
-    METRICS = []
     with open(LOGPATH, "r") as FILE:
         STR_RESULTS = os.stat(LOGPATH)
         ST_SIZE = STR_RESULTS[6]
         FILE.seek(ST_SIZE)
         while 1:
+            METRICS = []
             WHERE = FILE.tell()
             LINE = FILE.readline()
             if not LINE:
