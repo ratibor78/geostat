@@ -23,6 +23,7 @@ def logparse(LOGPATH, INFLUXHOST, INFLUXPORT, INFLUXDBDB, INFLUXUSER, INFLUXUSER
     IPS = {}
     GEOHASH = {}
     COUNT = {}
+    METRICS = []
     with open(LOGPATH, "r") as FILE:
         STR_RESULTS = os.stat(LOGPATH)
         ST_SIZE = STR_RESULTS[6]
@@ -41,10 +42,11 @@ def logparse(LOGPATH, INFLUXHOST, INFLUXPORT, INFLUXDBDB, INFLUXUSER, INFLUXUSER
                         HASH = Geohash.encode(INFO['latitude'], INFO['longitude']) # NOQA
                         GEOHASH['geohash'] = HASH
                         COUNT['count'] = 1
-                        IPS['measurement'] = 'MEASUREMENT'
+                        IPS['measurement'] = MEASUREMENT
                         IPS['tags'] = GEOHASH
                         IPS['fields'] = COUNT
-                        RESULT = json.dumps(IPS)
+                        METRICS.append(IPS)
+                        RESULT = json.dumps(METRICS)
                         print(RESULT)
 
 
