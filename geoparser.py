@@ -18,11 +18,13 @@ from influxdb import InfluxDBClient
 
 
 def logparse(LOGPATH, INFLUXHOST, INFLUXPORT, INFLUXDBDB, INFLUXUSER, INFLUXUSERPASS, MEASUREMENT): # NOQA
-    GI = pygeoip.GeoIP('GeoLiteCity.dat', pygeoip.const.MEMORY_CACHE)
+    CLIENT = InfluxDBClient(host=INFLUXHOST, port=INFLUXPORT,
+                            username=INFLUXUSER, password=INFLUXUSERPASS, database=INFLUXDBDB) # NOQA
     GETIP = r"^(?P<remote_host>[0-9]{,3}\.[0-9]{,3}\.[0-9]{,3}\.[0-9]{,3})"
-    IPS = {}
+    GI = pygeoip.GeoIP('GeoLiteCity.dat', pygeoip.const.MEMORY_CACHE)
     GEOHASH = {}
     COUNT = {}
+    IPS = {}
     with open(LOGPATH, "r") as FILE:
         STR_RESULTS = os.stat(LOGPATH)
         ST_SIZE = STR_RESULTS[6]
@@ -47,7 +49,7 @@ def logparse(LOGPATH, INFLUXHOST, INFLUXPORT, INFLUXDBDB, INFLUXUSER, INFLUXUSER
                         IPS['fields'] = COUNT
                         METRICS.append(IPS)
                         RESULT = json.dumps(METRICS)
-                        print(RESULT)
+                        CLIENT.write_points(RESULT)
 
 
 def main():
