@@ -38,6 +38,7 @@ def logparse(logpath):
                         HASH = Geohash.encode(INFO['latitude'], INFO['longitude']) # NOQA
                         IPS['count'] = 1
                         IPS['geohash'] = HASH
+                        print(IPS)
 
 
 def main():
