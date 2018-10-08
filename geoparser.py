@@ -7,21 +7,24 @@ import os
 import re
 # import sys
 import time
-# import json
+import json
 import pygeoip
 # import subprocess
 import Geohash
 import configparser
+from influxdb import InfluxDBClient
 # from collections import Counter
 # from datetime import datetime
 
 
-def logparse(logpath):
+def logparse(LOGPATH, INFLUXHOST, INFLUXPORT, INFLUXDBDB, INFLUXUSER, INFLUXUSERPASS, MEASUREMENT): # NOQA
     GI = pygeoip.GeoIP('GeoLiteCity.dat', pygeoip.const.MEMORY_CACHE)
     GETIP = r"^(?P<remote_host>[0-9]{,3}\.[0-9]{,3}\.[0-9]{,3}\.[0-9]{,3})"
     IPS = {}
-    with open(logpath, "r") as FILE:
-        STR_RESULTS = os.stat(logpath)
+    GEOHASH = {}
+    COUNT = {}
+    with open(LOGPATH, "r") as FILE:
+        STR_RESULTS = os.stat(LOGPATH)
         ST_SIZE = STR_RESULTS[6]
         FILE.seek(ST_SIZE)
         while 1:
@@ -36,22 +39,33 @@ def logparse(logpath):
                     INFO = GI.record_by_addr(IP)
                     if INFO is not None:
                         HASH = Geohash.encode(INFO['latitude'], INFO['longitude']) # NOQA
-                        IPS['count'] = 1
-                        IPS['geohash'] = HASH
-                        print(IPS)
+                        GEOHASH['geohash'] = HASH
+                        COUNT['count'] = 1
+                        IPS['measurement'] = 'MEASUREMENT'
+                        IPS['tags'] = GEOHASH
+                        IPS['fields'] = COUNT
+                        RESULT = json.dumps(IPS)
+                        print(RESULT)
 
 
 def main():
+
+    # Preparing of config reading
+    PWD = os.path.abspath(os.path.dirname(os.path.realpath(__file__)))
+    CONFIG = configparser.ConfigParser()
+    CONFIG.read('%s/settings.ini' % PWD)
+
     # Getting params from config
-    pwd = os.path.abspath(os.path.dirname(os.path.realpath(__file__)))
-    config = configparser.ConfigParser()
-    config.read('%s/settings.ini' % pwd)
-    logpath = config.get('NGINX_LOG', 'logpath')
-    # Parse given log file and send metrics
-    logparse(logpath)
-    # Send result to fle
-    # with open('/tmp/metrics.json', 'w') as outputfile:
-    #    json.dump(IPS_IN, outputfile, indent=4, sort_keys=True)
+    LOGPATH = CONFIG.get('NGINX_LOG', 'logpath')
+    INFLUXHOST = CONFIG.get('INFLUXDB', 'host')
+    INFLUXPORT = CONFIG.get('INFLUXDB', 'port')
+    INFLUXDBDB = CONFIG.get('INFLUXDB', 'database')
+    INFLUXUSER = CONFIG.get('INFLUXDB', 'username')
+    MEASUREMENT = CONFIG.get('INFLUXDB', 'measurement')
+    INFLUXUSERPASS = CONFIG.get('INFLUXDB', 'password')
+
+    # Parsing log file and sending metrics to Influxdb
+    logparse(LOGPATH, INFLUXHOST, INFLUXPORT, INFLUXDBDB, INFLUXUSER, INFLUXUSERPASS, MEASUREMENT) # NOQA
 
 
 if __name__ == '__main__':
