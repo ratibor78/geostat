@@ -1,0 +1,2 @@
+[NGINX_LOG]
+logpath = /var/log/nginx/access.log

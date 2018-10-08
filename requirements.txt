@@ -1,0 +1,4 @@
+configparser==3.5.0
+parsedatetime==2.4
+pygeoip==0.3.2
+Geohash==1.0
