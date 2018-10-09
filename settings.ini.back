@@ -1,2 +1,18 @@
 [NGINX_LOG]
+#Path for the log file (Nginx/Apache)
 logpath = /var/log/nginx/access.log
+
+[INFLUXDB]
+# Database URL
+host = 194.132.49.150
+port = 8086
+
+#Database name
+database = telegraf
+
+# HTTP Auth
+username = "telegraf"
+password = "secretpassword"
+
+#  Measurement name
+measurement = geotags

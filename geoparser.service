@@ -1,0 +1,16 @@
+***GeoStat.service***
+
+[Unit]
+Description=GeoStat
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=/opt/geostat/venv/bin/python geoparser.py
+User=root
+WorkingDirectory=/opt/geostat
+Restart=always
+RestartSec=2
+
+[Install]
+WantedBy=multi-user.target

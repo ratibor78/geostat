@@ -43,6 +43,7 @@ def logparse(LOGPATH, INFLUXHOST, INFLUXPORT, INFLUXDBDB, INFLUXUSER, INFLUXUSER
                         HASH = Geohash.encode(INFO['latitude'], INFO['longitude']) # NOQA
                         COUNT['count'] = 1
                         GEOHASH['geohash'] = HASH
+                        GEOHASH['country_code'] = INFO['country_code']
                         IPS['tags'] = GEOHASH
                         IPS['fields'] = COUNT
                         IPS['measurement'] = MEASUREMENT
@@ -76,4 +77,4 @@ if __name__ == '__main__':
         main()
     except KeyboardInterrupt:
         os.system('clear')
-        sys.exit()
+        sys.exit(0)
