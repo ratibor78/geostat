@@ -59,7 +59,6 @@ $ cp geostat.service /lib/systemd/system/
 ```sh
 $ wget http://geolite.maxmind.com/download/geoip/database/GeoLiteCity.dat.gz
 $ gunzip GeoLiteCity.dat.gz
-$ rm GeoLiteCity.dat.gz
 ```
 4) Then enable and start service
 ```sh
