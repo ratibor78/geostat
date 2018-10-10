@@ -55,13 +55,13 @@ $ cp geostat.service.template geostat.service
 $ vi geostat.service
 $ cp geostat.service /lib/systemd/system/
 ```
-4) Download latest GeoLiteCity.dat from MaxMind
+3) Download latest GeoLiteCity.dat from MaxMind
 ```sh
 $ wget http://geolite.maxmind.com/download/geoip/database/GeoLiteCity.dat.gz
 $ gunzip GeoLiteCity.dat.gz
 $ rm GeoLiteCity.dat.gz
 ```
-5) Then enable and start service
+4) Then enable and start service
 ```sh
 $ systemctl enable geostat.service
 $ systemctl start geostat.service
