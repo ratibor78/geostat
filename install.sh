@@ -1,7 +1,7 @@
 #! /usr/bin/env bash
 
 ##
-## Installetion script for GeoStat
+## Installation script for GeoStat
 ## Alexey Nizhegolenko 2018
 ##
 
