@@ -8,7 +8,24 @@ GeoStat is a Python script for parsing Nginx and Apache logs files and getting G
 
   - Parsing incoming ip's from web server log and convert them in to GEO metrics for   the InfluxDB.
   - Used standard python lib's for the maximus compatibility.
-  - Having an external 'settings.ini' for comfortable changing parameters.
+  - Having an external **settings.ini** for comfortable changing parameters.
+  
+Json format that script send to InfluxDB looks like: 
+```
+[
+    {
+        'fields': {
+            'count': 1
+        },
+        'measurement': 'geo_cube',
+        'tags': {
+            'geohash': 'u8mb76rpv69r',
+            'country_code': 'UA'
+        }
+     }
+]
+```
+As you can see there is two tags field, so you can build dashboards using geohash or just country code, count for any metric equal 1. This script don't parse log file from begining but parse it line by line after runing. So you can build dashboards using "count" of geohashes or country codes after some time will pass. 
 
 ### Tech
 
@@ -21,8 +38,8 @@ GeoStat uses a number of open source libs to work properly:
 ### Installation
 Using install.sh script:
 1) Clone the repository.
-2) CD into dir and run 'install.sh', it will ask you to set a properly settings.ini parameters, like Nginx access.log path, and InfluxDB settings.  
-3) After script will finished you only need to start SystemD service with 'systemctl start geostat.service'.
+2) CD into dir and run **install.sh**, it will ask you to set a properly settings.ini parameters, like Nginx **access.log** path, and InfluxDB settings.  
+3) After script will finished you only need to start SystemD service with **systemctl start geostat.service**.
 
 Manually:
 1) Clone the repository.
@@ -32,7 +49,7 @@ $ virtualenv venv && source venv/bin/activate
 $ pip install -r requirements.txt
 $ cp settings.ini.bak settings.ini
 ```
-2) Modify settings.ini & geostat.service files.
+2) Modify **settings.ini** & **geostat.service** files.
 ```sh
 $ vi settings.ini
 $ cp geostat.service.template geostat.service
