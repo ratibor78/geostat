@@ -1,14 +1,13 @@
-***GeoStat.service***
-
 [Unit]
 Description=GeoStat
 After=network.target
+StartLimitIntervalSec=0
 
 [Service]
 Type=simple
-ExecStart=/opt/geostat/venv/bin/python geoparser.py
+ExecStart=$PWD/venv/bin/python geoparser.py
 User=root
-WorkingDirectory=/opt/geostat
+WorkingDirectory=$PWD
 Restart=always
 RestartSec=2
 
