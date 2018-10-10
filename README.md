@@ -14,7 +14,7 @@ GeoStat is a Python script for parsing Nginx and Apache logs files and getting G
 
 GeoStat uses a number of open source libs to work properly:
 
-* [Geohash](https://github.com/vinsci/geohash.io) - Python module that provides functions for decoding and encoding Geohashes.
+* [Geohash](https://github.com/vinsci/geohash) - Python module that provides functions for decoding and encoding Geohashes.
 * [InfluxDB-Python](https://github.com/influxdata/influxdb-python) - Python client for InfluxDB.
 
 
