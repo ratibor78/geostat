@@ -10,7 +10,6 @@ echo "Downloading latest GeoLiteCity.dat from MaxMind"
 sleep 1
 wget http://geolite.maxmind.com/download/geoip/database/GeoLiteCity.dat.gz
 gunzip GeoLiteCity.dat.gz
-rm GeoLiteCity.dat.gz
 
 echo ""
 echo "Creating virtual ENV and installing requirements..."
