@@ -1,5 +1,5 @@
 [NGINX_LOG]
-#Path for the log file (Nginx/Apache)
+#Path for the log file (Nginx)
 logpath = /var/log/nginx/access.log
 
 [INFLUXDB]
