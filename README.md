@@ -9,8 +9,8 @@ GeoStat is a Python script for parsing Nginx and Apache logs files and getting G
   - Parsing incoming ip's from web server log and convert them in to GEO metrics for   the InfluxDB.
   - Used standard python lib's for the maximus compatibility.
   - Having an external **settings.ini** for comfortable changing parameters.
-  
-Json format that script send to InfluxDB looks like: 
+
+Json format that script send to InfluxDB looks like:
 ```
 [
     {
@@ -25,7 +25,7 @@ Json format that script send to InfluxDB looks like:
      }
 ]
 ```
-As you can see there is two tags field, so you can build dashboards using geohash or just country code, count for any metric equal 1. This script don't parse log file from begining but parse it line by line after runing. So you can build dashboards using "count" of geohashes or country codes after some time will pass. 
+As you can see there is two tags field, so you can build dashboards using geohash or just country code, count for any metric equal 1. This script don't parse log file from begining but parse it line by line after runing. So you can build dashboards using "count" of geohashes or country codes after some time will pass.
 
 ### Tech
 
@@ -55,7 +55,13 @@ $ cp geostat.service.template geostat.service
 $ vi geostat.service
 $ cp geostat.service /lib/systemd/system/
 ```
-3) Then enable and start service
+4) Download latest GeoLiteCity.dat from MaxMind
+```sh
+$ wget http://geolite.maxmind.com/download/geoip/database/GeoLiteCity.dat.gz
+$ gunzip GeoLiteCity.dat.gz
+$ rm GeoLiteCity.dat.gz
+```
+5) Then enable and start service
 ```sh
 $ systemctl enable geostat.service
 $ systemctl start geostat.service

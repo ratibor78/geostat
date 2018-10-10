@@ -76,4 +76,4 @@ if __name__ == '__main__':
     try:
         main()
     except KeyboardInterrupt:
-        os.system('clear')
+        sys.exit(0)
