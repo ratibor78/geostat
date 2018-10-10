@@ -34,8 +34,7 @@ GeoStat uses a number of open source libs to work properly:
 * [Geohash](https://github.com/vinsci/geohash) - Python module that provides functions for decoding and encoding Geohashes.
 * [InfluxDB-Python](https://github.com/influxdata/influxdb-python) - Python client for InfluxDB.
 
-
-### Installation
+# Installation
 Using install.sh script:
 1) Clone the repository.
 2) CD into dir and run **install.sh**, it will ask you to set a properly settings.ini parameters, like Nginx **access.log** path, and InfluxDB settings.  
