@@ -25,7 +25,7 @@ Json format that script send to InfluxDB looks like:
      }
 ]
 ```
-As you can see there is two tags field, so you can build dashboards using geohash or just country code, count for any metric equal 1. This script don't parse log file from begining but parse it line by line after runing. So you can build dashboards using "count" of geohashes or country codes after some time will pass.
+As you can see there is two tags fields, so you can build dashboards using geohash (with a point on the map) or country code, also count for any metric equal 1. This script don't parse log file from the begining but parse it line by line after runing. So you can build dashboards using **count** of geohashes or country codes after some time will pass.
 
 ### Tech
 
