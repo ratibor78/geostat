@@ -41,15 +41,15 @@ Using install.sh script:
 3) After script will finished you only need to start SystemD service with **systemctl start geostat.service**.
 
 Manually:
-1) Clone the repository.
+1) Clone the repository, create environment and install requirements
 ```sh
 $ cd geostat
 $ virtualenv venv && source venv/bin/activate
 $ pip install -r requirements.txt
-$ cp settings.ini.bak settings.ini
 ```
-2) Modify **settings.ini** & **geostat.service** files.
+2) Modify **settings.ini** & **geostat.service** files and copy service to systemd.
 ```sh
+$ cp settings.ini.bak settings.ini
 $ vi settings.ini
 $ cp geostat.service.template geostat.service
 $ vi geostat.service
