@@ -7,7 +7,7 @@ GeoStat is a Python script for parsing Nginx logs files and getting GEO data fro
 # Main Features:
 
   - Parsing incoming ip's from web server log and convert them in to GEO metrics for   the InfluxDB.
-  - Used standard python lib's for the maximus compatibility.
+  - Used standard python lib's for the maximum compatibility.
   - Having an external **settings.ini** for comfortable changing parameters.
 
 Json format that script send to InfluxDB looks like:
