@@ -18,6 +18,7 @@ def logparse(LOGPATH, INFLUXHOST, INFLUXPORT, INFLUXDBDB, INFLUXUSER, INFLUXUSER
     IPS = {}
     COUNT = {}
     GEOHASH = {}
+    HOSTNAME = os.uname()[1]
     CLIENT = InfluxDBClient(host=INFLUXHOST, port=INFLUXPORT,
                             username=INFLUXUSER, password=INFLUXUSERPASS, database=INFLUXDBDB) # NOQA
     GETIP = r"^(?P<remote_host>[0-9]{,3}\.[0-9]{,3}\.[0-9]{,3}\.[0-9]{,3})"
@@ -43,6 +44,7 @@ def logparse(LOGPATH, INFLUXHOST, INFLUXPORT, INFLUXDBDB, INFLUXUSER, INFLUXUSER
                         HASH = Geohash.encode(INFO['latitude'], INFO['longitude']) # NOQA
                         COUNT['count'] = 1
                         GEOHASH['geohash'] = HASH
+                        GEOHASH['host'] = HOSTNAME
                         GEOHASH['country_code'] = INFO['country_code']
                         IPS['tags'] = GEOHASH
                         IPS['fields'] = COUNT

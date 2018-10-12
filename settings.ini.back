@@ -15,4 +15,4 @@ username = "username"
 password = "password"
 
 #  Measurement name
-measurement = some_name
+measurement = geodata
