@@ -28,7 +28,7 @@ Json format that script send to InfluxDB looks like:
 ```
 As you can see there is three tags fields, so you can build dashboards using geohash (with a point on the map) or country code, or build dashboards with variables based on host name tag. A count for any metric equal 1. This script don't parse log file from the begining but parse it line by line after runing. So you can build dashboards using **count** of geohashes or country codes after some time will pass.
 
-You can see the example Grafana dashboard in geomap.json file.
+You can see the example Grafana dashboard in **geomap.json** file.
 
 ### Tech
 
