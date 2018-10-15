@@ -13,7 +13,7 @@ import configparser
 from influxdb import InfluxDBClient
 
 
-def logparse(LOGPATH, INFLUXHOST, INFLUXPORT, INFLUXDBDB, INFLUXUSER, INFLUXUSERPASS, MEASUREMENT): # NOQA
+def logparse(LOGPATH, INFLUXHOST, INFLUXPORT, INFLUXDBDB, INFLUXUSER, INFLUXUSERPASS, MEASUREMENT, INODE): # NOQA
     # Preparing variables and params
     IPS = {}
     COUNT = {}
@@ -29,10 +29,13 @@ def logparse(LOGPATH, INFLUXHOST, INFLUXPORT, INFLUXDBDB, INFLUXUSER, INFLUXUSER
         STR_RESULTS = os.stat(LOGPATH)
         ST_SIZE = STR_RESULTS[6]
         FILE.seek(ST_SIZE)
-        while 1:
+        while True:
             METRICS = []
             WHERE = FILE.tell()
             LINE = FILE.readline()
+            INODENEW = os.stat(LOGPATH).st_ino
+            if INODE != INODENEW:
+                break
             if not LINE:
                 time.sleep(1)
                 FILE.seek(WHERE)
@@ -71,7 +74,14 @@ def main():
     INFLUXUSERPASS = CONFIG.get('INFLUXDB', 'password')
 
     # Parsing log file and sending metrics to Influxdb
-    logparse(LOGPATH, INFLUXHOST, INFLUXPORT, INFLUXDBDB, INFLUXUSER, INFLUXUSERPASS, MEASUREMENT) # NOQA
+    while True:
+        # Get inode from log file
+        INODE = os.stat(LOGPATH).st_ino
+        # Run main loop and grep a log file
+        if os.path.exists(LOGPATH):
+            logparse(LOGPATH, INFLUXHOST, INFLUXPORT, INFLUXDBDB, INFLUXUSER, INFLUXUSERPASS, MEASUREMENT, INODE) # NOQA
+        else:
+            print('File %s not found' % LOGPATH)
 
 
 if __name__ == '__main__':
