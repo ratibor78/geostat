@@ -2,6 +2,10 @@
 #Path for the log file (Nginx)
 logpath = /var/log/nginx/access.log
 
+[GEOIP]
+geoipdb = /usr/local/share/GeoIP/GeoLite2-City.mmdb
+# For country use /usr/local/share/GeoIP/GeoLite2-Country.mmdb
+
 [INFLUXDB]
 # Database URL
 host = ip_address
