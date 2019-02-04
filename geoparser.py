@@ -2,18 +2,20 @@
 
 # Getting GEO information from Nginx access.log by IP's.
 # Alexey Nizhegolenko 2018
+# Parts added by Remko Lodder, 2019.
+# Added: IPv6 matching, make query based on geoip2 instead of
+# geoip, which is going away r.s.n.
 
 import os
 import re
 import sys
 import time
-import pygeoip
+import geoip2.database
 import Geohash
 import configparser
 from influxdb import InfluxDBClient
 
-
-def logparse(LOGPATH, INFLUXHOST, INFLUXPORT, INFLUXDBDB, INFLUXUSER, INFLUXUSERPASS, MEASUREMENT, INODE): # NOQA
+def logparse(LOGPATH, INFLUXHOST, INFLUXPORT, INFLUXDBDB, INFLUXUSER, INFLUXUSERPASS, MEASUREMENT, GEOIPDB, INODE): # NOQA
     # Preparing variables and params
     IPS = {}
     COUNT = {}
@@ -21,8 +23,11 @@ def logparse(LOGPATH, INFLUXHOST, INFLUXPORT, INFLUXDBDB, INFLUXUSER, INFLUXUSER
     HOSTNAME = os.uname()[1]
     CLIENT = InfluxDBClient(host=INFLUXHOST, port=INFLUXPORT,
                             username=INFLUXUSER, password=INFLUXUSERPASS, database=INFLUXDBDB) # NOQA
-    GETIP = r"^(?P<remote_host>[0-9]{,3}\.[0-9]{,3}\.[0-9]{,3}\.[0-9]{,3})"
-    GI = pygeoip.GeoIP('GeoLiteCity.dat', pygeoip.const.MEMORY_CACHE)
+
+    re_IPV4 = re.compile('(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})')
+    re_IPV6 = re.compile('(([0-9a-fA-F]{1,4}:){7,7}[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,7}:|([0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,5}(:[0-9a-fA-F]{1,4}){1,2}|([0-9a-fA-F]{1,4}:){1,4}(:[0-9a-fA-F]{1,4}){1,3}|([0-9a-fA-F]{1,4}:){1,3}(:[0-9a-fA-F]{1,4}){1,4}|([0-9a-fA-F]{1,4}:){1,2}(:[0-9a-fA-F]{1,4}){1,5}|[0-9a-fA-F]{1,4}:((:[0-9a-fA-F]{1,4}){1,6})|:((:[0-9a-fA-F]{1,4}){1,7}|:)|fe80:(:[0-9a-fA-F]{0,4}){0,4}%[0-9a-zA-Z]{1,}|::(ffff(:0{1,4}){0,1}:){0,1}((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])|([0-9a-fA-F]{1,4}:){1,4}:((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9]))')
+
+    GI = geoip2.database.Reader(GEOIPDB)
 
     # Main loop to parse access.log file in tailf style with sending metrcs
     with open(LOGPATH, "r") as FILE:
@@ -40,15 +45,21 @@ def logparse(LOGPATH, INFLUXHOST, INFLUXPORT, INFLUXDBDB, INFLUXUSER, INFLUXUSER
                 time.sleep(1)
                 FILE.seek(WHERE)
             else:
-                IP = re.search(GETIP, LINE).group(1)
+		if re_IPV4.match(LINE):
+		    m = re_IPV4.match(LINE)
+		    IP = m.group(1)
+		elif re_IPV6.match(LINE):
+		    m = re_IPV6.match(LINE)
+		    IP = m.group(1)
+
                 if IP:
-                    INFO = GI.record_by_addr(IP)
+                    INFO = GI.city(IP)
                     if INFO is not None:
-                        HASH = Geohash.encode(INFO['latitude'], INFO['longitude']) # NOQA
+                        HASH = Geohash.encode(INFO.location.latitude, INFO.location.longitude) # NOQA
                         COUNT['count'] = 1
                         GEOHASH['geohash'] = HASH
                         GEOHASH['host'] = HOSTNAME
-                        GEOHASH['country_code'] = INFO['country_code']
+                        GEOHASH['country_code'] = INFO.country.iso_code
                         IPS['tags'] = GEOHASH
                         IPS['fields'] = COUNT
                         IPS['measurement'] = MEASUREMENT
@@ -65,6 +76,7 @@ def main():
     CONFIG.read('%s/settings.ini' % PWD)
 
     # Getting params from config
+    GEOIPDB = CONFIG.get('GEOIP', 'geoipdb')
     LOGPATH = CONFIG.get('NGINX_LOG', 'logpath')
     INFLUXHOST = CONFIG.get('INFLUXDB', 'host')
     INFLUXPORT = CONFIG.get('INFLUXDB', 'port')
@@ -79,7 +91,7 @@ def main():
         INODE = os.stat(LOGPATH).st_ino
         # Run main loop and grep a log file
         if os.path.exists(LOGPATH):
-            logparse(LOGPATH, INFLUXHOST, INFLUXPORT, INFLUXDBDB, INFLUXUSER, INFLUXUSERPASS, MEASUREMENT, INODE) # NOQA
+            logparse(LOGPATH, INFLUXHOST, INFLUXPORT, INFLUXDBDB, INFLUXUSER, INFLUXUSERPASS, MEASUREMENT, GEOIPDB, INODE) # NOQA
         else:
             print('File %s not found' % LOGPATH)
 
