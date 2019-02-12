@@ -3,8 +3,8 @@
 logpath = /var/log/nginx/access.log
 
 [GEOIP]
-geoipdb = /usr/local/share/GeoIP/GeoLite2-City.mmdb
-# For country use /usr/local/share/GeoIP/GeoLite2-Country.mmdb
+#Path for the GEOIP DB file
+geoipdb = ./GeoLite2-City.mmdb
 
 [INFLUXDB]
 # Database URL

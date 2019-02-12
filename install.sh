@@ -5,11 +5,16 @@
 ## Alexey Nizhegolenko 2018
 ##
 
+WORKDIR=$(pwd)
+
 echo ""
 echo "Downloading latest GeoLiteCity.dat from MaxMind"
 sleep 1
-wget http://geolite.maxmind.com/download/geoip/database/GeoLiteCity.dat.gz
-gunzip GeoLiteCity.dat.gz
+wget https://geolite.maxmind.com/download/geoip/database/GeoLite2-City.tar.gz
+mkdir tmpgeo
+tar -xvf GeoLite2-City.tar.gz -C ./tmpgeo && cd ./tmpgeo/*/.
+cp ./GeoLite2-City.mmdb $WORKDIR
+cd $WORKDIR
 
 echo ""
 echo "Creating virtual ENV and installing requirements..."
