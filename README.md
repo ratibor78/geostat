@@ -58,7 +58,7 @@ $ cp geostat.service.template geostat.service
 $ vi geostat.service
 $ cp geostat.service /lib/systemd/system/
 ```
-3) Download latest GeoLiteCity.dat from MaxMind
+3) Download latest GeoLite2-City.mmdb from MaxMind
 ```sh
 $ wget https://geolite.maxmind.com/download/geoip/database/GeoLite2-City.tar.gz
 $ tar -xvzf GeoLite2-City.tar.gz
