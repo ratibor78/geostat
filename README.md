@@ -1,5 +1,5 @@
 # GeoStat
-### Version 0.2
+### Version 0.3
 ![Alt text](https://github.com/ratibor78/geostat/blob/master/geostat.png?raw=true "Grafana dashboard example")
 
 
