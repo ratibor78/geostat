@@ -14,6 +14,7 @@ import geoip2.database
 import Geohash
 import configparser
 from influxdb import InfluxDBClient
+from IPy import IP as ipadd
 
 def logparse(LOGPATH, INFLUXHOST, INFLUXPORT, INFLUXDBDB, INFLUXUSER, INFLUXUSERPASS, MEASUREMENT, GEOIPDB, INODE): # NOQA
     # Preparing variables and params
@@ -52,7 +53,7 @@ def logparse(LOGPATH, INFLUXHOST, INFLUXPORT, INFLUXDBDB, INFLUXUSER, INFLUXUSER
                     m = re_IPV6.match(LINE)
                     IP = m.group(1)
 
-                if IP:
+                if ipadd(IP).iptype() == 'PUBLIC'  and IP:
                     INFO = GI.city(IP)
                     if INFO is not None:
                         HASH = Geohash.encode(INFO.location.latitude, INFO.location.longitude) # NOQA
