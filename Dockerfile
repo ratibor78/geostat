@@ -17,10 +17,9 @@ RUN apk add --no-cache \
     pip2 install -r /tmp/requirements.txt && \
     rm -r /root/.cache
 
-RUN wget https://geolite.maxmind.com/download/geoip/database/GeoLite2-City.tar.gz 
-RUN mkdir tmpgeo
-RUN tar -xvf GeoLite2-City.tar.gz -C ./tmpgeo 
-RUN cp /tmpgeo/*/GeoLite2-City.mmdb /
+RUN wget https://geolite.maxmind.com/download/geoip/database/GeoLite2-City.tar.gz && \ 
+    mkdir tmpgeo && tar -xvf GeoLite2-City.tar.gz -C ./tmpgeo && \ 
+    cp /tmpgeo/*/GeoLite2-City.mmdb / && rm -rf ./tmpgeo
 
 # Copy the application file
 ADD geoparser.py /
