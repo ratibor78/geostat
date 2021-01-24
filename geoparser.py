@@ -11,7 +11,7 @@ import re
 import sys
 import time
 import geoip2.database
-import Geohash
+import geohash
 import configparser
 from influxdb import InfluxDBClient
 from IPy import IP as ipadd
@@ -56,7 +56,7 @@ def logparse(LOGPATH, INFLUXHOST, INFLUXPORT, INFLUXDBDB, INFLUXUSER, INFLUXUSER
                 if ipadd(IP).iptype() == 'PUBLIC'  and IP:
                     INFO = GI.city(IP)
                     if INFO is not None:
-                        HASH = Geohash.encode(INFO.location.latitude, INFO.location.longitude) # NOQA
+                        HASH = geohash.encode(INFO.location.latitude, INFO.location.longitude) # NOQA
                         COUNT['count'] = 1
                         GEOHASH['geohash'] = HASH
                         GEOHASH['host'] = HOSTNAME

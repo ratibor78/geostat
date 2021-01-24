@@ -5,7 +5,7 @@ StartLimitIntervalSec=0
 
 [Service]
 Type=simple
-ExecStart=$PWD/venv/bin/python geoparser.py
+ExecStart=$PWD/venv/bin/python3 geoparser.py
 User=root
 WorkingDirectory=$PWD
 Restart=always

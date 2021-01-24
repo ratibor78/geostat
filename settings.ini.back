@@ -8,15 +8,15 @@ geoipdb = ./GeoLite2-City.mmdb
 
 [INFLUXDB]
 # Database URL
-host = ip_address
+host = 185.27.96.227
 port = 8086
 
 #Database name
-database = db_name
+database = telegraf
 
 # HTTP Auth
-username = "username"
-password = "password"
+username = telegraf
+password = itieh0eeMo
 
 #  Measurement name
 measurement = geodata
