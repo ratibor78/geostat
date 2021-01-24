@@ -77,7 +77,7 @@ def logparse(LOGPATH, INFLUXHOST, INFLUXPORT, INFLUXDBDB, INFLUXUSER, INFLUXUSER
                         GEOHASH['geohash'] = HASH
                         GEOHASH['host'] = HOSTNAME
                         GEOHASH['country_code'] = INFO.country.iso_code
-                        GEOHASH['country_name'] = INFO.country.country.name
+                        GEOHASH['country_name'] = INFO.country.name
                         GEOHASH['city_name'] = INFO.city.name
                         IPS['tags'] = GEOHASH
                         IPS['fields'] = COUNT
