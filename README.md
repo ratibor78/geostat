@@ -53,7 +53,8 @@ GeoStat uses a number of open source libs to work properly:
 
 ## Important
 The GeoLite2-City database no longer available for the simple downloading, now you need register on the maxmind.com website first.
-After you'll get an account on the maxmind.com you can find the needed file by the link (https://www.maxmind.com/en/accounts/YOURACCOUNTID/geoip/downloads)
+After you'll get an account on the maxmind.com you can find the needed file by the link
+(https://www.maxmind.com/en/accounts/YOURACCOUNTID/geoip/downloads)
 Please don't forget to unzip and put the GeoLite2-City.mmdb file in the same directory with the geoparse.py script, or you can put it anywhere and then fix the path in the settings.ini.
 
 # Installation
