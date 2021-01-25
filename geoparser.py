@@ -1,4 +1,4 @@
-#! /usr/bin/env python
+#! /usr/bin/env python3
 
 # Getting GEO information from Nginx access.log by IP's.
 # Alexey Nizhegolenko 2018
@@ -10,11 +10,27 @@ import os
 import re
 import sys
 import time
+import geohash
+import logging
+import logging.handlers
 import geoip2.database
-import Geohash
 import configparser
 from influxdb import InfluxDBClient
 from IPy import IP as ipadd
+
+
+class SyslogBOMFormatter(logging.Formatter):
+    def format(self, record):
+        result = super().format(record)
+        return "ufeff" + result
+
+
+handler = logging.handlers.SysLogHandler('/dev/log')
+formatter = SyslogBOMFormatter(logging.BASIC_FORMAT)
+handler.setFormatter(formatter)
+root = logging.getLogger(__name__)
+root.setLevel(os.environ.get("LOGLEVEL", "INFO"))
+root.addHandler(handler)
 
 def logparse(LOGPATH, INFLUXHOST, INFLUXPORT, INFLUXDBDB, INFLUXUSER, INFLUXUSERPASS, MEASUREMENT, GEOIPDB, INODE): # NOQA
     # Preparing variables and params
@@ -53,21 +69,26 @@ def logparse(LOGPATH, INFLUXHOST, INFLUXPORT, INFLUXDBDB, INFLUXUSER, INFLUXUSER
                     m = re_IPV6.match(LINE)
                     IP = m.group(1)
 
-                if ipadd(IP).iptype() == 'PUBLIC'  and IP:
+                if ipadd(IP).iptype() == 'PUBLIC' and IP:
                     INFO = GI.city(IP)
                     if INFO is not None:
-                        HASH = Geohash.encode(INFO.location.latitude, INFO.location.longitude) # NOQA
+                        HASH = geohash.encode(INFO.location.latitude, INFO.location.longitude) # NOQA
                         COUNT['count'] = 1
                         GEOHASH['geohash'] = HASH
                         GEOHASH['host'] = HOSTNAME
                         GEOHASH['country_code'] = INFO.country.iso_code
+                        GEOHASH['country_name'] = INFO.country.name
+                        GEOHASH['city_name'] = INFO.city.name
                         IPS['tags'] = GEOHASH
                         IPS['fields'] = COUNT
                         IPS['measurement'] = MEASUREMENT
                         METRICS.append(IPS)
 
                         # Sending json data to InfluxDB
-                        CLIENT.write_points(METRICS)
+                        try:
+                            CLIENT.write_points(METRICS)
+                        except Exception:
+                            logging.exception("Cannot establish connection with InfluxDB server: ") # NOQA
 
 
 def main():
@@ -94,11 +115,15 @@ def main():
         if os.path.exists(LOGPATH):
             logparse(LOGPATH, INFLUXHOST, INFLUXPORT, INFLUXDBDB, INFLUXUSER, INFLUXUSERPASS, MEASUREMENT, GEOIPDB, INODE) # NOQA
         else:
-            print('File %s not found' % LOGPATH)
+            logging.info('Nginx log file %s not found', LOGPATH)
+            print('Nginx log file %s not found' % LOGPATH)
 
 
 if __name__ == '__main__':
     try:
         main()
+    except Exception:
+        logging.exception("Exception in main(): ")
     except KeyboardInterrupt:
+        logging.exception("Exception KeyboardInterrupt: ")
         sys.exit(0)

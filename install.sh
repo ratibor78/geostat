@@ -8,30 +8,21 @@
 WORKDIR=$(pwd)
 
 echo ""
-echo "Downloading latest GeoLiteCity.dat from MaxMind"
+echo "Creating virtual ENV and install all needed requirements..."
 sleep 1
-wget https://geolite.maxmind.com/download/geoip/database/GeoLite2-City.tar.gz
-mkdir tmpgeo
-tar -xvf GeoLite2-City.tar.gz -C ./tmpgeo && cd ./tmpgeo/*/.
-cp ./GeoLite2-City.mmdb $WORKDIR
-cd $WORKDIR
+python3 -m venv venv && source venv/bin/activate
+
+pip3 install -r requirements.txt && deactivate
 
 echo ""
-echo "Creating virtual ENV and installing requirements..."
-sleep 1
-virtualenv venv && source venv/bin/activate
-
-pip install -r requirements.txt && deactivate
-
-echo ""
-echo "Please edit settings.ini file and set right parameters..."
+echo "Please edit settings.ini file and set the needed parameters..."
 sleep 1
 cp settings.ini.back settings.ini
 
 "${VISUAL:-"${EDITOR:-vi}"}" "settings.ini"
 
 echo ""
-echo "Installing SystemD service..."
+echo "Installing GeoStat SystemD service..."
 sleep 1
 while read line
 do
@@ -41,6 +32,14 @@ done < "./geostat.service.template" > /lib/systemd/system/geostat.service
 systemctl enable geostat.service
 
 echo ""
-echo "All done, now you can start getting GEO data from your log"
-echo "run 'systemctl start geostat.service' for this"
+echo "Last step, you need to register and download the lates GeoLite2 City mmdb file from the maxmind.com website"
+echo "After you get an account on the maxmind.com you can find the needed file by the link below"
+echo "https://www.maxmind.com/en/accounts/YOURACCOUNTID/geoip/downloads"
+echo "Please don't forget to unzip and put the GeoLite2-City.mmdb file in the same directory with the geoparse.py"
+echo "script, or you can put it enywhere and then fix the path in the settings.ini"
+
+echo ""
+echo "Good, all was done and you can start getting GEO data from your Nginx/Apache log file now"
+echo "Please run 'systemctl start geostat.service' for starting the GeoStat script"
+echo "You can find the GeoStat application logs in the syslog file if you need"
 echo "Good Luck !"

@@ -1,5 +1,4 @@
 configparser==3.5.0
 influxdb==5.2.0
-Geohash==1.0
 geoip2==2.9.0
 IPy==1.00
