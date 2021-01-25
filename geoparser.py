@@ -88,7 +88,7 @@ def logparse(LOGPATH, INFLUXHOST, INFLUXPORT, INFLUXDBDB, INFLUXUSER, INFLUXUSER
                         try:
                             CLIENT.write_points(METRICS)
                         except Exception:
-                            logging.exception("Cannot establish connection to InfluxDB: ") # NOQA
+                            logging.exception("Cannot establish connection with InfluxDB server: ") # NOQA
 
 
 def main():

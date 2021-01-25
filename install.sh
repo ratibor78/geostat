@@ -36,7 +36,7 @@ echo "Last step, you need to register and download the lates GeoLite2 City mmdb 
 echo "After you get an account on the maxmind.com you can find the needed file by the link below"
 echo "https://www.maxmind.com/en/accounts/YOURACCOUNTID/geoip/downloads"
 echo "Please don't forget to unzip and put the GeoLite2-City.mmdb file in the same directory with the geoparse.py"
-echo "script, or you can put it enywhere and then change the way in the settings.ini"
+echo "script, or you can put it enywhere and then fix the path in the settings.ini"
 
 echo ""
 echo "Good, all was done and you can start getting GEO data from your Nginx/Apache log file now"
