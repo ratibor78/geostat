@@ -88,7 +88,7 @@ def logparse(LOGPATH, INFLUXHOST, INFLUXPORT, INFLUXDBDB, INFLUXUSER, INFLUXUSER
                         try:
                             CLIENT.write_points(METRICS)
                         except Exception:
-                            logging.exception("Cannot establish connection to InfluxDB: ")
+                            logging.exception("Cannot establish connection to InfluxDB: ") # NOQA
 
 
 def main():
@@ -115,7 +115,8 @@ def main():
         if os.path.exists(LOGPATH):
             logparse(LOGPATH, INFLUXHOST, INFLUXPORT, INFLUXDBDB, INFLUXUSER, INFLUXUSERPASS, MEASUREMENT, GEOIPDB, INODE) # NOQA
         else:
-            print('File %s not found' % LOGPATH)
+            logging.info('Nginx log file %s not found', LOGPATH)
+            print('Nginx log file %s not found' % LOGPATH)
 
 
 if __name__ == '__main__':
