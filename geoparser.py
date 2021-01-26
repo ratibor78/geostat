@@ -1,5 +1,3 @@
-#! /usr/bin/env python3
-
 # Getting GEO information from Nginx access.log by IP's.
 # Alexey Nizhegolenko 2018
 # Parts added by Remko Lodder, 2019.
