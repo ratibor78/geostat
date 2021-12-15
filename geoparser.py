@@ -16,7 +16,7 @@ import configparser
 from influxdb import InfluxDBClient
 from IPy import IP as ipadd
 
-
+import glob
 class SyslogBOMFormatter(logging.Formatter):
     def format(self, record):
         result = super().format(record)
@@ -107,14 +107,16 @@ def main():
 
     # Parsing log file and sending metrics to Influxdb
     while True:
-        # Get inode from log file
-        INODE = os.stat(LOGPATH).st_ino
-        # Run main loop and grep a log file
-        if os.path.exists(LOGPATH):
-            logparse(LOGPATH, INFLUXHOST, INFLUXPORT, INFLUXDBDB, INFLUXUSER, INFLUXUSERPASS, MEASUREMENT, GEOIPDB, INODE) # NOQA
-        else:
-            logging.info('Nginx log file %s not found', LOGPATH)
-            print('Nginx log file %s not found' % LOGPATH)
+        files = glob.glob(LOGPATH)
+        for fileName in files:
+            # Get inode from log file
+            INODE = os.stat(fileName).st_ino
+            # Run main loop and grep a log file
+            if os.path.exists(fileName):
+                logparse(fileName, INFLUXHOST, INFLUXPORT, INFLUXDBDB, INFLUXUSER, INFLUXUSERPASS, MEASUREMENT, GEOIPDB, INODE) # NOQA
+            else:
+                logging.info('Nginx log file %s not found', LOGPATH)
+                print('Nginx log file %s not found' % LOGPATH)
 
 
 if __name__ == '__main__':
