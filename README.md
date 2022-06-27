@@ -77,7 +77,7 @@ $ pip3 install -r requirements.txt
 ```
 2) Modify **settings.ini** & **geostat.service** files and copy service to systemd.
 ```sh
-$ cp settings.ini.bak settings.ini
+$ cp settings.ini.back settings.ini
 $ vi settings.ini
 $ cp geostat.service.template geostat.service
 $ vi geostat.service
