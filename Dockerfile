@@ -1,4 +1,4 @@
-FROM alpine
+FROM alpine:3.9
 
 LABEL maintainer "Alexey Nizhegolenko <ratibor78@gmail.com>"
 LABEL description "Geostat application"
