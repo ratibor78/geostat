@@ -1,6 +1,6 @@
-[NGINX_LOG]
+[NGINX_LOGS]
 #Path for the log file (Nginx)
-logpath = /var/log/nginx/access.log
+logpath = website1:/var/log/website1/access.log website2:/var/log/website2/access.log
 
 [GEOIP]
 #Path for the GEOIP DB file
