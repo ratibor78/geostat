@@ -8,7 +8,7 @@ GeoStat it's a Python-based script for parsing Nginx and Apache log files and ge
 # New in version 2.2
 - The application was rewritten by adding the availability of parsing more than one log file at one time, now you can parse multiple separated websites     on the host. To do that please set up all virtual hosts or websites to save their log files in different places.
  
-  The settings.ini configuration for log files now look in this way, you need to put the config in that format  **website.name:/var/log/website_access.log**. Different logs must be separated with a space.
+  The settings.ini configuration for log files now looks in this way, you need to put the config in that format  **website.name:/var/log/website_access.log**. Different logs must be separated with a space.
   
   The example you can find in settings.ini.back:
   ```
