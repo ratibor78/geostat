@@ -6,7 +6,7 @@
 GeoStat it's a Python-based script for parsing Nginx and Apache log files and getting GEO data from incoming IPs from it. This script converts parsed data into JSON format and sends it to the InfluxDB database, so you can use it for building nice Grafana dashboards for example. The application runs as SystemD service and parses log files in "tailf" style. Also, you can run it as a Docker container if you wish.
 
 # New in version 2.2
-- The application was rewritten by adding the availability of parsing more than one log file at one time, now you can parse multiple separated websites     on the host. To do that please set up all virtual hosts or websites to save their log files in different places.
+- The application was rewritten with adding the availability of parsing more than one log file at one time, now you can parse multiple separated websites     on the host. To do that please set up all virtual hosts or websites to save their log files in different places.
  
   The settings.ini configuration for log files now looks in this way, you need to put the config in that format  **website.name:/var/log/website_access.log**. Different logs must be separated with a space.
   
