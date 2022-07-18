@@ -1,9 +1,20 @@
 # GeoStat
-### Version 2.0
+### Version 2.2
 ![Alt text](https://github.com/ratibor78/geostat/blob/master/geostat.png?raw=true "Grafana dashboard example")
 
 
 GeoStat it's a Python-based script for parsing Nginx and Apache log files and getting GEO data from incoming IPs from it. This script converts parsed data into JSON format and sends it to the InfluxDB database, so you can use it for building nice Grafana dashboards for example. The application runs as SystemD service and parses log files in "tailf" style. Also, you can run it as a Docker container if you wish.
+
+# New in version 2.2
+- The application was rewritten with adding availability of parsing more than one log file at one time, now you can parse multiple separated website on     the host. To do that please set up that all virtual hosts or websites saved their log files in different files.
+  The settings.ini configuration for log files now look in this way, you need to put website.name:/var/log/website_access.log format, different logs 
+  mus t be separated with space. The example you can find in settings.ini.back:
+  ```
+  [NGINX_LOGS]
+  #Path for the log file (Nginx)
+  logpath = website1:/var/log/website1/access.log website2:/var/log/website2/access.log
+  ```
+- Fixed the Docker container issue, that was related to the new Python3 version in Alpine image. 
 
 # New in version 2.0
 - The application was rewritten with python3
@@ -32,6 +43,7 @@ JSON format that script sends to InfluxDB looks like:
         'measurement': 'geo_cube',
         'tags': {
             'host': 'cube'
+            'website': 'website.com'
             'geohash': 'u8mb76rpv69r',
             'country_code': 'UA'
             'country_name': 'Ukraine'
@@ -40,7 +52,7 @@ JSON format that script sends to InfluxDB looks like:
      }
 ]
 ```
-As you can see there are five fields in the JSON output, so you can build dashboards using geo-hash (with a point on the map) or country code, or with the country name and city name. Build dashboards with variables based on the hostname tag or combine them all. A count for any metric equals 1, so it'll be easy summarising. This script doesn't parse the log file from the beginning but parses it line by line after starting. So you can build dashboards using **count** of data after some time will pass.
+As you can see there are six fields in the JSON output, so you can build dashboards using geo-hash (with a point on the map) or country code, or with the country name and city name. Build dashboards with variables based on the hostname tag or combine them all. A count for any metric equals 1, so it'll be easy summarising. This script doesn't parse the log file from the beginning but parses it line by line after starting. So you can build dashboards using **count** of data after some time will pass.
 
 You can find the example of the Grafana dashboard in **geomap.json** file or take it from the grafana.com: https://grafana.com/dashboards/8342
 
