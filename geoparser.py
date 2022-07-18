@@ -3,6 +3,8 @@
 # Parts added by Remko Lodder, 2019.
 # Added: IPv6 matching, make query based on geoip2 instead of
 # geoip, which is going away r.s.n.
+# Added possibility of processing more than one Nginx log file,
+# by adding threading support. 2022 July by Alexey Nizhegolenko
 
 import os
 import re
@@ -15,6 +17,7 @@ import geoip2.database
 import configparser
 from influxdb import InfluxDBClient
 from IPy import IP as ipadd
+import threading
 
 
 class SyslogBOMFormatter(logging.Formatter):
@@ -30,7 +33,7 @@ root = logging.getLogger(__name__)
 root.setLevel(os.environ.get("LOGLEVEL", "INFO"))
 root.addHandler(handler)
 
-def logparse(LOGPATH, INFLUXHOST, INFLUXPORT, INFLUXDBDB, INFLUXUSER, INFLUXUSERPASS, MEASUREMENT, GEOIPDB, INODE): # NOQA
+def logparse(LOGPATH, WEBSITE, INFLUXHOST, INFLUXPORT, INFLUXDBDB, INFLUXUSER, INFLUXUSERPASS, MEASUREMENT, GEOIPDB, INODE): # NOQA
     # Preparing variables and params
     IPS = {}
     COUNT = {}
@@ -43,8 +46,7 @@ def logparse(LOGPATH, INFLUXHOST, INFLUXPORT, INFLUXDBDB, INFLUXUSER, INFLUXUSER
     re_IPV6 = re.compile('(([0-9a-fA-F]{1,4}:){7,7}[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,7}:|([0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,5}(:[0-9a-fA-F]{1,4}){1,2}|([0-9a-fA-F]{1,4}:){1,4}(:[0-9a-fA-F]{1,4}){1,3}|([0-9a-fA-F]{1,4}:){1,3}(:[0-9a-fA-F]{1,4}){1,4}|([0-9a-fA-F]{1,4}:){1,2}(:[0-9a-fA-F]{1,4}){1,5}|[0-9a-fA-F]{1,4}:((:[0-9a-fA-F]{1,4}){1,6})|:((:[0-9a-fA-F]{1,4}){1,7}|:)|fe80:(:[0-9a-fA-F]{0,4}){0,4}%[0-9a-zA-Z]{1,}|::(ffff(:0{1,4}){0,1}:){0,1}((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])|([0-9a-fA-F]{1,4}:){1,4}:((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9]))') # NOQA
 
     GI = geoip2.database.Reader(GEOIPDB)
-
-    # Main loop to parse access.log file in tailf style with sending metrcs
+    # Main loop that parses log file in tailf style with sending metrics out
     with open(LOGPATH, "r") as FILE:
         STR_RESULTS = os.stat(LOGPATH)
         ST_SIZE = STR_RESULTS[6]
@@ -55,7 +57,7 @@ def logparse(LOGPATH, INFLUXHOST, INFLUXPORT, INFLUXDBDB, INFLUXUSER, INFLUXUSER
             LINE = FILE.readline()
             INODENEW = os.stat(LOGPATH).st_ino
             if INODE != INODENEW:
-                break
+                return
             if not LINE:
                 time.sleep(1)
                 FILE.seek(WHERE)
@@ -74,6 +76,7 @@ def logparse(LOGPATH, INFLUXHOST, INFLUXPORT, INFLUXDBDB, INFLUXUSER, INFLUXUSER
                         COUNT['count'] = 1
                         GEOHASH['geohash'] = HASH
                         GEOHASH['host'] = HOSTNAME
+                        GEOHASH['website'] = WEBSITE
                         GEOHASH['country_code'] = INFO.country.iso_code
                         GEOHASH['country_name'] = INFO.country.name
                         GEOHASH['city_name'] = INFO.city.name
@@ -81,8 +84,7 @@ def logparse(LOGPATH, INFLUXHOST, INFLUXPORT, INFLUXDBDB, INFLUXUSER, INFLUXUSER
                         IPS['fields'] = COUNT
                         IPS['measurement'] = MEASUREMENT
                         METRICS.append(IPS)
-
-                        # Sending json data to InfluxDB
+                        # Sending json data itto InfluxDB
                         try:
                             CLIENT.write_points(METRICS)
                         except Exception:
@@ -90,14 +92,14 @@ def logparse(LOGPATH, INFLUXHOST, INFLUXPORT, INFLUXDBDB, INFLUXUSER, INFLUXUSER
 
 
 def main():
-    # Preparing for reading config file
+    # Preparing for reading the config file
     PWD = os.path.abspath(os.path.dirname(os.path.realpath(__file__)))
     CONFIG = configparser.ConfigParser()
-    CONFIG.read('%s/settings.ini' % PWD)
+    CONFIG.read(f'{PWD}/settings.ini')
 
     # Getting params from config
     GEOIPDB = CONFIG.get('GEOIP', 'geoipdb')
-    LOGPATH = CONFIG.get('NGINX_LOG', 'logpath')
+    LOGPATH = CONFIG.get('NGINX_LOGS', 'logpath').split()
     INFLUXHOST = CONFIG.get('INFLUXDB', 'host')
     INFLUXPORT = CONFIG.get('INFLUXDB', 'port')
     INFLUXDBDB = CONFIG.get('INFLUXDB', 'database')
@@ -107,14 +109,29 @@ def main():
 
     # Parsing log file and sending metrics to Influxdb
     while True:
-        # Get inode from log file
-        INODE = os.stat(LOGPATH).st_ino
-        # Run main loop and grep a log file
-        if os.path.exists(LOGPATH):
-            logparse(LOGPATH, INFLUXHOST, INFLUXPORT, INFLUXDBDB, INFLUXUSER, INFLUXUSERPASS, MEASUREMENT, GEOIPDB, INODE) # NOQA
-        else:
-            logging.info('Nginx log file %s not found', LOGPATH)
-            print('Nginx log file %s not found' % LOGPATH)
+        logs = []
+        thread_names = []
+        for logitem in LOGPATH:
+            logs.append(logitem.split(":"))
+        for website, log in logs:
+            # Get inode from log file
+            if os.path.exists(log):
+                INODE = os.stat(log).st_ino
+            else:
+                logging.info('Nginx log file %s not found', log)
+                print('Nginx log file %s not found' % log)
+                return
+            # Run the main loop and grep data in separate threads
+            t = website
+            if os.path.exists(log):
+                t = threading.Thread(target=logparse, args=[log, website, INFLUXHOST, INFLUXPORT, INFLUXDBDB, INFLUXUSER, INFLUXUSERPASS, MEASUREMENT, GEOIPDB, INODE], daemon=True, name=website) # NOQA
+                for thread in threading.enumerate():
+                    thread_names.append(thread.name)
+                if website not in thread_names:
+                    t.start()
+            else:
+                logging.info('Nginx log file %s not found', log)
+                print('Nginx log file %s not found' % log)
 
 
 if __name__ == '__main__':
