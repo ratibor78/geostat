@@ -129,8 +129,8 @@ def main():
         INFLUXDBBUCKET = CONFIG.get('INFLUXDB2', 'bucket')
         MEASUREMENT = CONFIG.get('INFLUXDB2', 'measurement')
         INFLUXDBORG = CONFIG.get('INFLUXDB2', 'organization')
-    KWARGS1 = {}
-    KWARGS2 = {}
+
+
     # Parsing log file and sending metrics to Influxdb
     while True:
         logs = []
@@ -147,17 +147,12 @@ def main():
                 return
             if INFLUXDB_VERSION == "1":
                 # Run the main loop and grep data in separate threads
-                KWARGS1 = {'GEOIPDB': GEOIPDB, 'LOGPATH': LOGPATH, 'INFLUXHOST': INFLUXHOST,
-                           'INODE': INODE, 'WEBSITE': website, 'INFLUXPORT': INFLUXPORT, 'INFLUXDBDB': INFLUXDBDB,
-                           'INFLUXUSER': INFLUXUSER, 'MEASUREMENT': MEASUREMENT,
-                           'INFLUXUSERPASS': INFLUXUSERPASS, 'INFLUXDB_VERSION': INFLUXDB_VERSION} # NOQA
-
-                KWARGS2 = {'LOGPATH': LOGPATH, 'URL': URL, 'INFLUXDBTOKEN': INFLUXDBTOKEN,
-                           'INFLUXDBBUCKET': INFLUXDBBUCKET, 'MEASUREMENT': MEASUREMENT,
-                           'INODE': INODE, 'WEBSITE': website, 'INFLUXDBORG': INFLUXDBORG} # NOQA
                 t = website
                 if os.path.exists(log):
-                    t = threading.Thread(target=logparse, kwargs=KWARGS1, daemon=True, name=website) # NOQA
+                    t = threading.Thread(target=logparse, kwargs={'GEOIPDB': GEOIPDB, 'LOGPATH': LOGPATH, 'INFLUXHOST': INFLUXHOST,
+                               'INODE': INODE, 'WEBSITE': website, 'INFLUXPORT': INFLUXPORT, 'INFLUXDBDB': INFLUXDBDB,
+                               'INFLUXUSER': INFLUXUSER, 'MEASUREMENT': MEASUREMENT,
+                               'INFLUXUSERPASS': INFLUXUSERPASS, 'INFLUXDB_VERSION': INFLUXDB_VERSION}, daemon=True, name=website) # NOQA
                     for thread in threading.enumerate():
                         thread_names.append(thread.name)
                     if website not in thread_names:
@@ -169,7 +164,9 @@ def main():
                 # Run the main loop and grep data in separate threads
                 t = website
                 if os.path.exists(log):
-                    t = threading.Thread(target=logparse, kwargs=KWARGS2, daemon=True, name=website) # NOQA
+                    t = threading.Thread(target=logparse, kwargs={'LOGPATH': LOGPATH, 'URL': URL, 'INFLUXDBTOKEN': INFLUXDBTOKEN,
+                               'INFLUXDBBUCKET': INFLUXDBBUCKET, 'MEASUREMENT': MEASUREMENT,
+                               'INODE': INODE, 'WEBSITE': website, 'INFLUXDBORG': INFLUXDBORG}, daemon=True, name=website) # NOQA
                     for thread in threading.enumerate():
                         thread_names.append(thread.name)
                     if website not in thread_names:
