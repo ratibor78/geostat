@@ -123,10 +123,6 @@ def main():
         INFLUXUSER = CONFIG.get('INFLUXDB1', 'username')
         MEASUREMENT = CONFIG.get('INFLUXDB1', 'measurement')
         INFLUXUSERPASS = CONFIG.get('INFLUXDB1', 'password')
-        KWARGS1 = {'GEOIPDB': GEOIPDB, 'LOGPATH': LOGPATH, 'INFLUXHOST': INFLUXHOST,
-                   'INFLUXPORT': INFLUXPORT, 'INFLUXDBDB': INFLUXDBDB,
-                   'INFLUXUSER': INFLUXUSER, 'MEASUREMENT': MEASUREMENT,
-                   'INFLUXUSERPASS': INFLUXUSERPASS, 'INFLUXDB_VERSION': INFLUXDB_VERSION} # NOQA
     elif INFLUXDB_VERSION == "2":
         # Getting params from config for version 2
         LOGPATH = CONFIG.get('NGINX_LOGS', 'logpath').split()
@@ -135,9 +131,6 @@ def main():
         INFLUXDBBUCKET = CONFIG.get('INFLUXDB2', 'bucket')
         MEASUREMENT = CONFIG.get('INFLUXDB2', 'measurement')
         INFLUXDBORG = CONFIG.get('INFLUXDB2', 'organization')
-        KWARGS2 = {'LOGPATH': LOGPATH, 'URL': URL, 'INFLUXDBTOKEN': INFLUXDBTOKEN,
-                   'INFLUXDBBUCKET': INFLUXDBBUCKET, 'MEASUREMENT': MEASUREMENT,
-                   'INFLUXDBORG': INFLUXDBORG} # NOQA
 
     # Parsing log file and sending metrics to Influxdb
     while True:
@@ -153,9 +146,16 @@ def main():
                 logging.info('Nginx log file %s not found', log)
                 print('Nginx log file %s not found' % log)
                 return
-
             if INFLUXDB_VERSION == "1":
                 # Run the main loop and grep data in separate threads
+                KWARGS1 = {'GEOIPDB': GEOIPDB, 'LOGPATH': LOGPATH, 'INFLUXHOST': INFLUXHOST,
+                           'INODE': INODE, 'WEBSITE': website, 'INFLUXPORT': INFLUXPORT, 'INFLUXDBDB': INFLUXDBDB,
+                           'INFLUXUSER': INFLUXUSER, 'MEASUREMENT': MEASUREMENT,
+                           'INFLUXUSERPASS': INFLUXUSERPASS, 'INFLUXDB_VERSION': INFLUXDB_VERSION} # NOQA
+
+                KWARGS2 = {'LOGPATH': LOGPATH, 'URL': URL, 'INFLUXDBTOKEN': INFLUXDBTOKEN,
+                           'INFLUXDBBUCKET': INFLUXDBBUCKET, 'MEASUREMENT': MEASUREMENT,
+                           'INODE': INODE, 'WEBSITE': website, 'INFLUXDBORG': INFLUXDBORG} # NOQA
                 t = website
                 if os.path.exists(log):
                     t = threading.Thread(target=logparse, kwargs=KWARGS1, daemon=True, name=website) # NOQA
