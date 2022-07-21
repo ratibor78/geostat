@@ -1,9 +1,13 @@
 # GeoStat
-### Version 2.2
+### Version 2.3
 ![Alt text](https://github.com/ratibor78/geostat/blob/master/geostat.png?raw=true "Grafana dashboard example")
 
 
-GeoStat it's a Python-based script for parsing Nginx and Apache log files and getting GEO data from incoming IPs from it. This script converts parsed data into JSON format and sends it to the InfluxDB database, so you can use it for building nice Grafana dashboards for example. The application runs as SystemD service and parses log files in "tailf" style. Also, you can run it as a Docker container if you wish.
+GeoStat a Python-based script for parsing Nginx and Apache log files and getting GEO data about incoming IPs from them. This script converts parsed data into JSON format and sends it to the InfluxDB database, so you can use it for building nice Grafana dashboards. Now, this program supports old InfluxDB 1.8 and modern InfluxDB 2. The application runs as SystemD service and parses log files in "tailf" style. Also, you can run it as a Docker container if you wish.
+
+# New in version 2.3
+- Was added the InfluxDB 2 support, now you can use not only old InfluxDB 1.8 but also send data into modern InfluxDB 2.* 
+- Was fixed small bugs also. 
 
 # New in version 2.2
 - The application was rewritten with adding the availability of parsing more than one log file at one time, now you can parse multiple separated websites     on the host. To do that please set up all virtual hosts or websites to save their log files in different places.
