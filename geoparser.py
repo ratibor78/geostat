@@ -124,6 +124,7 @@ def main():
         INFLUXUSERPASS = CONFIG.get('INFLUXDB1', 'password')
     elif INFLUXDB_VERSION == "2":
         # Getting params from config for version 2
+        GEOIPDB = CONFIG.get('GEOIP', 'geoipdb')
         LOGPATH = CONFIG.get('NGINX_LOGS', 'logpath').split()
         URL = CONFIG.get('INFLUXDB2', 'url')
         INFLUXDBTOKEN = CONFIG.get('INFLUXDB2', 'token')
