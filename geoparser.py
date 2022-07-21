@@ -149,7 +149,7 @@ def main():
                 # Run the main loop and grep data in separate threads
                 t = website
                 if os.path.exists(log):
-                    t = threading.Thread(target=logparse, kwargs={'GEOIPDB': GEOIPDB, 'LOGPATH': LOGPATH, 'INFLUXHOST': INFLUXHOST,
+                    t = threading.Thread(target=logparse, kwargs={'GEOIPDB': GEOIPDB, 'LOGPATH': log, 'INFLUXHOST': INFLUXHOST,
                                'INODE': INODE, 'WEBSITE': website, 'INFLUXPORT': INFLUXPORT, 'INFLUXDBDB': INFLUXDBDB,
                                'INFLUXUSER': INFLUXUSER, 'MEASUREMENT': MEASUREMENT,
                                'INFLUXUSERPASS': INFLUXUSERPASS, 'INFLUXDB_VERSION': INFLUXDB_VERSION}, daemon=True, name=website) # NOQA
@@ -164,7 +164,7 @@ def main():
                 # Run the main loop and grep data in separate threads
                 t = website
                 if os.path.exists(log):
-                    t = threading.Thread(target=logparse, kwargs={'LOGPATH': LOGPATH, 'URL': URL, 'INFLUXDBTOKEN': INFLUXDBTOKEN,
+                    t = threading.Thread(target=logparse, kwargs={'LOGPATH': log, 'URL': URL, 'INFLUXDBTOKEN': INFLUXDBTOKEN,
                                'INFLUXDBBUCKET': INFLUXDBBUCKET, 'MEASUREMENT': MEASUREMENT,
                                'INODE': INODE, 'WEBSITE': website, 'INFLUXDBORG': INFLUXDBORG}, daemon=True, name=website) # NOQA
                     for thread in threading.enumerate():
