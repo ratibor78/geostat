@@ -5,6 +5,7 @@
 # geoip, which is going away r.s.n.
 # Added possibility of processing more than one Nginx log file,
 # by adding threading support. 2022 July by Alexey Nizhegolenko
+# Added InfluxDB 2 support. 2022/07/21 by Alexey Nizhegolenko
 
 import os
 import re
@@ -130,7 +131,6 @@ def main():
         MEASUREMENT = CONFIG.get('INFLUXDB2', 'measurement')
         INFLUXDBORG = CONFIG.get('INFLUXDB2', 'organization')
 
-
     # Parsing log file and sending metrics to Influxdb
     while True:
         logs = []
@@ -164,8 +164,8 @@ def main():
                 # Run the main loop and grep data in separate threads
                 t = website
                 if os.path.exists(log):
-                    t = threading.Thread(target=logparse, kwargs={'LOGPATH': log, 'URL': URL, 'INFLUXDBTOKEN': INFLUXDBTOKEN,
-                               'INFLUXDBBUCKET': INFLUXDBBUCKET, 'MEASUREMENT': MEASUREMENT,
+                    t = threading.Thread(target=logparse, kwargs={'GEOIPDB': GEOIPDB, 'LOGPATH': log, 'URL': URL, 'INFLUXDBTOKEN': INFLUXDBTOKEN,
+                               'INFLUXDBBUCKET': INFLUXDBBUCKET, 'MEASUREMENT': MEASUREMENT, 'INFLUXDB_VERSION': INFLUXDB_VERSION,
                                'INODE': INODE, 'WEBSITE': website, 'INFLUXDBORG': INFLUXDBORG}, daemon=True, name=website) # NOQA
                     for thread in threading.enumerate():
                         thread_names.append(thread.name)
