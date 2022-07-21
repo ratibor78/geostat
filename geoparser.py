@@ -108,8 +108,6 @@ def main():
     PWD = os.path.abspath(os.path.dirname(os.path.realpath(__file__)))
     CONFIG = configparser.ConfigParser()
     CONFIG.read(f'{PWD}/settings.ini')
-    KWARGS1 = {}
-    KWARGS2 = {}
     # Get the InfluxDB version so we can parse only needed part of config
     INFLUXDB_VERSION = CONFIG.get('INFLUXDB_VERSION', 'version')
 
@@ -131,7 +129,8 @@ def main():
         INFLUXDBBUCKET = CONFIG.get('INFLUXDB2', 'bucket')
         MEASUREMENT = CONFIG.get('INFLUXDB2', 'measurement')
         INFLUXDBORG = CONFIG.get('INFLUXDB2', 'organization')
-
+    KWARGS1 = {}
+    KWARGS2 = {}
     # Parsing log file and sending metrics to Influxdb
     while True:
         logs = []
