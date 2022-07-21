@@ -48,7 +48,7 @@ def logparse(LOGPATH, WEBSITE, MEASUREMENT, GEOIPDB, INODE, INFLUXDB_VERSION,
         CLIENT = InfluxDBClient(host=INFLUXHOST, port=INFLUXPORT,
                                 username=INFLUXUSER, password=INFLUXUSERPASS, database=INFLUXDBDB) # NOQA
     elif INFLUXDB_VERSION == "2":
-        CLIENT = InfluxDBClient(url=URL, token=INFLUXDBTOKEN, org=INFLUXDBORG) # NOQA
+        CLIENT = InfluxDBClient2(url=URL, token=INFLUXDBTOKEN, org=INFLUXDBORG) # NOQA
 
     re_IPV4 = re.compile('(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})')
     re_IPV6 = re.compile('(([0-9a-fA-F]{1,4}:){7,7}[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,7}:|([0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,5}(:[0-9a-fA-F]{1,4}){1,2}|([0-9a-fA-F]{1,4}:){1,4}(:[0-9a-fA-F]{1,4}){1,3}|([0-9a-fA-F]{1,4}:){1,3}(:[0-9a-fA-F]{1,4}){1,4}|([0-9a-fA-F]{1,4}:){1,2}(:[0-9a-fA-F]{1,4}){1,5}|[0-9a-fA-F]{1,4}:((:[0-9a-fA-F]{1,4}){1,6})|:((:[0-9a-fA-F]{1,4}){1,7}|:)|fe80:(:[0-9a-fA-F]{0,4}){0,4}%[0-9a-zA-Z]{1,}|::(ffff(:0{1,4}){0,1}:){0,1}((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])|([0-9a-fA-F]{1,4}:){1,4}:((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9]))') # NOQA
@@ -108,7 +108,8 @@ def main():
     PWD = os.path.abspath(os.path.dirname(os.path.realpath(__file__)))
     CONFIG = configparser.ConfigParser()
     CONFIG.read(f'{PWD}/settings.ini')
-
+    KWARGS1 = {}
+    KWARGS2 = {}
     # Get the InfluxDB version so we can parse only needed part of config
     INFLUXDB_VERSION = CONFIG.get('INFLUXDB_VERSION', 'version')
 
@@ -122,15 +123,21 @@ def main():
         INFLUXUSER = CONFIG.get('INFLUXDB1', 'username')
         MEASUREMENT = CONFIG.get('INFLUXDB1', 'measurement')
         INFLUXUSERPASS = CONFIG.get('INFLUXDB1', 'password')
+        KWARGS1 = {'GEOIPDB': GEOIPDB, 'LOGPATH': LOGPATH, 'INFLUXHOST': INFLUXHOST,
+                   'INFLUXPORT': INFLUXPORT, 'INFLUXDBDB': INFLUXDBDB,
+                   'INFLUXUSER': INFLUXUSER, 'MEASUREMENT': MEASUREMENT,
+                   'INFLUXUSERPASS': INFLUXUSERPASS, 'INFLUXDB_VERSION': INFLUXDB_VERSION} # NOQA
     elif INFLUXDB_VERSION == "2":
         # Getting params from config for version 2
-        GEOIPDB = CONFIG.get('GEOIP', 'geoipdb')
         LOGPATH = CONFIG.get('NGINX_LOGS', 'logpath').split()
         URL = CONFIG.get('INFLUXDB2', 'url')
         INFLUXDBTOKEN = CONFIG.get('INFLUXDB2', 'token')
         INFLUXDBBUCKET = CONFIG.get('INFLUXDB2', 'bucket')
         MEASUREMENT = CONFIG.get('INFLUXDB2', 'measurement')
         INFLUXDBORG = CONFIG.get('INFLUXDB2', 'organization')
+        KWARGS2 = {'LOGPATH': LOGPATH, 'URL': URL, 'INFLUXDBTOKEN': INFLUXDBTOKEN,
+                   'INFLUXDBBUCKET': INFLUXDBBUCKET, 'MEASUREMENT': MEASUREMENT,
+                   'INFLUXDBORG': INFLUXDBORG} # NOQA
 
     # Parsing log file and sending metrics to Influxdb
     while True:
@@ -151,7 +158,7 @@ def main():
                 # Run the main loop and grep data in separate threads
                 t = website
                 if os.path.exists(log):
-                    t = threading.Thread(target=logparse, args=[log, website, INFLUXDB_VERSION, INFLUXHOST, INFLUXPORT, INFLUXDBDB, INFLUXUSER, INFLUXUSERPASS, MEASUREMENT, GEOIPDB, INODE], daemon=True, name=website) # NOQA
+                    t = threading.Thread(target=logparse, kwargs=KWARGS1, daemon=True, name=website) # NOQA
                     for thread in threading.enumerate():
                         thread_names.append(thread.name)
                     if website not in thread_names:
@@ -163,7 +170,7 @@ def main():
                 # Run the main loop and grep data in separate threads
                 t = website
                 if os.path.exists(log):
-                    t = threading.Thread(target=logparse, args=[log, website, INFLUXDB_VERSION, URL, INFLUXDBTOKEN, INFLUXDBBUCKET, INFLUXDBORG, MEASUREMENT, GEOIPDB, INODE], daemon=True, name=website) # NOQA
+                    t = threading.Thread(target=logparse, kwargs=KWARGS2, daemon=True, name=website) # NOQA
                     for thread in threading.enumerate():
                         thread_names.append(thread.name)
                     if website not in thread_names:
