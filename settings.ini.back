@@ -8,7 +8,7 @@ geoipdb = ./GeoLite2-City.mmdb
 
 [INFLUXDB_VERSION]
 # Version of the InfluxDB, 1 = old 1.8 and early, 2 = new 2.0 and more
-# Set this parameter to 1 if you want use old InfluxDB version like 1.8
+# Set this parameter to 1 if you prefer to use an old InfluxDB version like 1.8
 # Or set this parameter to 2 if you plan to use InfluxDB version 2.1 or modern
 version = 1
 
@@ -38,7 +38,7 @@ url = INFLUXDB_SERVER_IP:PORT
 # Token for authentication
 token = ANY EXISTED USER TOKEN
 
-# Organization is the name of the organization you wish to write to
+# Organization - the name of the organization you wish to write to
 organization = ORGANIZATION NAME
 
 # Destination bucket to write into
